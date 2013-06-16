@@ -33,10 +33,13 @@ int StrToInt(const char *str)
 		}
 		if (str[i] == '-') {
 			flag = -1;
+			i++;
+		} else if (str[i] == '+') {
+			flag = 1;
+			i++;
 		} else {
 			flag = 1;
 		}
-		i++;
 		break;
 	}
 
