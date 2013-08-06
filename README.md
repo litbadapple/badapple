@@ -6,4 +6,6 @@ Personal Code Test
 
 /pongo  :Coding for pongo challenge match.
 
-/blogs  :Document for usefull knowledge.
+/blogs  :Document for useful knowledge.
+
+/misc	:Code or Tools that will be useful.
