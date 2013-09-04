@@ -1,0 +1,25 @@
+主从Mysql配置:
+
+主(ip:192.168.79.110):
+my.ini
+	log-bin=mysql-bin
+	server-id=1
+
+	binlog-ignore-db=mysql
+	binlog-do-db=dbradius
+	binlog-do-db=radius
+
+sql语句:
+GRANT FILE,SELECT,REPLICATION SLAVE ON *.* TO backup@192.168.79.13 IDENTIFIED BY '123qwe';
+
+从(ip:192.168.79.13):
+my.ini
+	server-id=2
+	master-host=192.168.79.110
+	master-port=3306
+	master-user=backup
+	master-password=123qwe
+	master-connect-retry=60
+
+	replicate-do-db=dbradius
+	replicate-do-db=radius
