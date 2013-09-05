@@ -17,7 +17,7 @@ my.ini
 	master-host=192.168.79.110
 	master-port=3306
 	master-user=backup
-	master-password=123qwe
+	master-password=123456
 	master-connect-retry=60
 
 	replicate-do-db=radius
