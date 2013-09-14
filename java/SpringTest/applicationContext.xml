@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 设置sessionFactory -->
+	<bean id="sessionFactoryParent"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.connection.provider_class">org.hibernate.connection.ProxoolConnectionProvider
+				</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop><!-- add by shaojunwu -->
+				<prop key="hibernate.validator.apply_to_ddl">false</prop>
+				<prop key="javax.persistence.validation.mode">none</prop>
+
+				<prop key="hibernate.proxool.xml">proxool.xml</prop>
+				<prop key="hibernate.proxool.pool_alias">dbPool</prop>
+				<!-- 解决sleep连接过多问题 -->
+				<prop key="hibernate.connection.release_mode">auto</prop>
+				<prop key="hibernate.connection.autocommit">true</prop>
+				<prop key="hibernate.jdbc.batch_size">50</prop>
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>					
+			</list>
+		</property>
+	</bean>
+	
+	
+	<bean id="sessionFactoryMaster"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" parent="sessionFactoryParent">
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.proxool.xml">proxoolMaster.xml</prop>
+				<prop key="hibernate.proxool.pool_alias">dbPoolMaster</prop>
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:bean/</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="sessionFactorySlave"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean" parent="sessionFactoryParent">
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.proxool.xml">proxoolSlave.xml</prop>
+				<prop key="hibernate.proxool.pool_alias">dbPoolSlave</prop>
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:bean/</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="sessionFactoryControl"
+		class="control.SessionControl">
+		<property name="sessionFactoryList">
+			<list>
+				<ref bean="sessionFactoryMaster" />
+				<ref bean="sessionFactorySlave" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="sessionFactory"
+	    class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+			<property name="targetObject" ref="sessionFactoryControl" />
+			<property name="targetMethod" value="getActiveFactory" />
+    </bean>
+
+	<!-- Spring事务管理 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"
+		autowire="byName">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="transactionManager" />
+	</bean>
+
+	<!-- Hibernate拦截器 -->
+	<bean id="hibernateInterceptor" class="org.springframework.orm.hibernate3.HibernateInterceptor">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="radCheckService"
+		class="service.radCheckService">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+</beans>
