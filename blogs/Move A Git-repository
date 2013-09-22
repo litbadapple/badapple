@@ -13,7 +13,7 @@
         cd ..
         rm -rf project.git
 
-5). 到新服务器 GitCafe 上找到 Clone 地址，直接 Clone 到本地就可以了。
+5). 到新服务器 GitHub 上找到 Clone 地址，直接 Clone 到本地就可以了。
         git clone git@github.com:username/newproject.git
 
 这种方式可以保留原版本库中的所有内容。
